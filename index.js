@@ -86,7 +86,10 @@ const gameBoard = (() => {
         if (winRuleIndex !== undefined) updateWinnerUI(winner, winRules, winRuleIndex)
         else if (isTie) updateTieUI()
         // ai mode && game won or tie
-        if(aiMode && winRuleIndex !== undefined || isTie) setTimeout(() => resetGame(), 3000) // reset after 3 secs
+        if(aiMode && winRuleIndex !== undefined || isTie){
+            document.querySelector('#startBtn').disabled = true
+            setTimeout(() => resetGame(), 3000)
+        }// reset after 3 secs
     }
     function updateWinnerUI(winner, winRules, winRuleIndex) {
         gameState = 'pause'
@@ -131,6 +134,7 @@ const gameBoard = (() => {
             '', '', '',
         ]
         document.querySelector('.winnerText').textContent = ''
+        document.querySelector('#startBtn').disabled = false
         currentPlayer = player1
         gameState = 'play'
         displayController()
