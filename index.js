@@ -17,6 +17,7 @@ const gameBoard = (() => {
     let player2 = playerFactory('player2', 'X')
     let currentPlayer = player1
     let gameState = 'play'
+    let aiMode = false
 
 
     const displayController = () => {
@@ -50,6 +51,10 @@ const gameBoard = (() => {
         currentPlayer = currentPlayer === player1 ? player2 : player1
         displayController()
         checkWinner()
+        // for Ai mode
+        if (aiMode && currentPlayer == player2 && gameState == 'play') {
+            setTimeout(() => aiRound(), 300);
+        }
     }
 
     function checkWinner() {
@@ -61,27 +66,62 @@ const gameBoard = (() => {
         ]
         let winner;
         let winRuleIndex = undefined;
+        let isTie;
         // check each rule to have 3 same markers
         winRules.forEach((rule, i) => {
+            // if(winRuleIndex !== undefined) return
             let marker = board[rule[0]] // e.g. get 'X' from cell 0
             if (!marker) return
             let isWon = rule.every(x => board[x] === marker)
             if (isWon) {
                 winStatus = true;
-                winner = marker === 'O' ? player1 : player2
+                winner = marker === player1.marker ? player1 : player2
                 console.log(winner)
                 winRuleIndex = i
+            } else {
+                isTie = board.every(x => x !== '')
             }
         })
-        // update greencolor UI if winner exists
+        // update greencolor UI if winner exists, else  tie
         if (winRuleIndex !== undefined) updateWinnerUI(winner, winRules, winRuleIndex)
+        else if (isTie) updateTieUI()
+        // ai mode && game won or tie
+        if(aiMode && winRuleIndex !== undefined || isTie) setTimeout(() => resetGame(), 3000) // reset after 3 secs
     }
     function updateWinnerUI(winner, winRules, winRuleIndex) {
         gameState = 'pause'
-        document.querySelector('.winnerText').textContent = `Winner : ${winner.name}`
         winRules[winRuleIndex].forEach(x => {
             document.querySelector(`[data-index="${x}"]`).classList.add('win')
         })
+        document.querySelector('.winnerText').textContent = `Winner : ${winner.name}`
+        // ai mode 
+        if(aiMode) document.querySelector('.winnerText').textContent = `Winner : ${winner.name}. Restart in 3 secs ...`
+    }
+    function updateTieUI() {
+        gameState = 'pause'
+        document.querySelector('.winnerText').textContent = `a Tie. Restart!`
+        // ai mode 
+        if(aiMode) document.querySelector('.winnerText').textContent = `Tie. Restart in 3 secs ...`
+    }
+    function turnOnAiMode() {
+        // update UI
+        let x = this.previousElementSibling
+        this.setAttribute('disabled', true)
+        x.previousSibling.remove()
+        x.remove()
+        player2.name = 'computer'
+        aiMode = true
+    }
+    function aiRound() {
+        console.log('ai mode')
+        let randomIndex
+        while (true) {
+            randomIndex = Math.floor(Math.random() * 9)
+            console.log(randomIndex)
+            if (board[randomIndex] === '') break;
+        }
+        let el = document.querySelector(`[data-index="${randomIndex}"]`)
+        el.click()
     }
 
     function resetGame() {
@@ -95,16 +135,25 @@ const gameBoard = (() => {
         gameState = 'play'
         displayController()
     }
+    function setMarker(e){
+        let marker = e.target.value
+        console.log(marker)
+        player1.marker = marker
+        player2.marker = marker === 'O' ? 'X' : 'O' 
+        resetGame()
+    }
     // input / button click event
-    document.querySelector('button').addEventListener('click', resetGame)
+    document.querySelector('#startBtn').addEventListener('click', resetGame)
+    document.querySelector('#vsAi').addEventListener('click', turnOnAiMode)
     document.querySelector('#player1Input').addEventListener('input', e => {
-        console.log(e.target.value)
         player1.name = e.target.value
     })
     document.querySelector('#player2Input').addEventListener('input', e => {
         player2.name = e.target.value
     })
-
+    document.querySelector('#rBtnO').addEventListener('input', e => setMarker(e))
+    document.querySelector('#rBtnX').addEventListener('input', e => setMarker(e))
+    
 
     displayController()
 
@@ -112,10 +161,11 @@ const gameBoard = (() => {
         player1,
         player2,
         board,
-        displayController
+        displayController,
+        resetGame,
+        checkWinner,
     }
 })()
-
 
 
 

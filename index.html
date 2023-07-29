@@ -11,12 +11,25 @@
 <body>
     <h1>Tic Tac Toe Game</h1>
     <div class="inputDiv">
-        <p> Player 1's name : <input type="text" id="player1Input"></p>
-        <h3> VS </h3>
-        <p> Player 2's name : <input type="text" id="player2Input"><p>
+        <div class="nameDiv">
+            <p> Player 1's name : <input type="text" id="player1Input"></p>
+            <h3> VS </h3>
+            <p> Player 2's name : 
+                <input type="text" id="player2Input">
+                <button type='button' id="vsAi">Switch to Computer </button>
+            </p>
+        </div>
+        <div class="markerDiv">
+            <p>Marker : </p>
+            <p> <input type="radio" id='rBtnO' name="player1-marker" value="O" checked><label for="rBtnO">O</label> 
+                <input type="radio" id='rBtnX' name="player1-marker" value="X"><label for="rBtnX">X</label> 
+            </p>
+        </div>
+
     </div>
+    
     <div class="container"></div>
-    <button type='button'> Reset </button>
+    <button type='button' id='startBtn'> Start / Reset </button>
     <h2 class="winnerText"></h2>
 
     <script src="./index.js"></script>
